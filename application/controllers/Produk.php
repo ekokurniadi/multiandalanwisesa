@@ -116,6 +116,80 @@ class Produk extends MY_Controller {
 
     }
 
+    public function fetch_data2(){
+      $starts       = $this->input->post("start");
+      $length       = $this->input->post("length");
+      $LIMIT        = "LIMIT  $starts, $length ";
+      $draw         = $this->input->post("draw");
+      $search       = $this->input->post('search')['value'];
+      $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
+      
+      $where ="WHERE 1=1";
+      $searchingColumn;
+      $result=array();
+      if (isset($search)) {
+        if ($search != '') {
+           $searchingColumn = $search;
+              $where .= " AND (kode_barang LIKE '%$search%'
+                              OR nama_barang LIKE '%$search%'
+                              OR harga_satuan LIKE '%$search'
+                              )";
+            }
+        }
+
+      if (isset($orders)) {
+          if ($orders != '') {
+            $order = $orders;
+            $order_column = ['','kode_barang','nama_barang','harga_satuan'];
+            $order_clm  = $order_column[$order[0]['column']];
+            $order_by   = $order[0]['dir'];
+            $where .= " ORDER BY $order_clm $order_by ";
+          } else {
+            $where .= " ORDER BY id ASC ";
+          }
+        } else {
+          $where .= " ORDER BY id ASC ";
+        }
+        if (isset($LIMIT)) {
+          if ($LIMIT != '') {
+            $where .= ' ' . $LIMIT;
+          }
+        }
+      $index=1;
+      $button="";
+      $fetch = $this->db->query("SELECT * FROM produk $where");
+      $fetch2 = $this->db->query("SELECT * FROM produk");
+      foreach($fetch->result() as $rows){
+          $button1= "<a href=".base_url('produk/read/'.$rows->id)." class='btn btn-icon icon-left btn-light'><i class='fa fa-eye'></i></a>";
+        
+          $button2= "<a href=".base_url('produk/update/'.$rows->id)." class='btn btn-icon icon-left btn-warning'><i class='fa fa-pencil-square-o'></i></a>";
+         
+          $button3 = "<a href=".base_url('produk/delete/'.$rows->id)." class='btn btn-icon icon-left btn-danger' onclick='javasciprt: return confirm(\"Are You Sure ?\")''><i class='fa fa-trash'></i></a>";
+        
+          $sub_array=array();
+          $sub_array[]=$index;
+          $sub_array[]=$rows->kode_barang;
+          $sub_array[]=$rows->nama_barang;
+          $sub_array[]=number_format($rows->harga_satuan,0,'.',',');
+          $result[]      = $sub_array;
+          $index++;
+      }
+      $output = array(
+        "draw"            =>     intval($this->input->post("draw")),
+        "recordsFiltered" =>     $fetch2->num_rows(),
+        "data"            =>     $result,
+       
+      );
+      echo json_encode($output);
+
+  }
+
+    public function index_mobile(){
+      $this->load->view('header2');
+      $this->load->view('produk_list2');
+      $this->load->view('footer2');
+    }
+
     public function upload_data(){
         $this->load->view('header');
         $this->load->view('import_produk');
