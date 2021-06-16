@@ -89,7 +89,148 @@
 
 
 	}
+	public function fetch_data(){
+        $starts       = $this->input->post("start");
+        $length       = $this->input->post("length");
+        $LIMIT        = "LIMIT  $starts, $length ";
+        $draw         = $this->input->post("draw");
+        $search       = $this->input->post('searching');
+        $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
+        
+        $where ="WHERE 1=1 ";
+        $searchingColumn;
+        $result=array();
+        if (isset($search)) {
+          if ($search != '') {
+             $searchingColumn = $search;
+                $where .= " AND (kode_customer LIKE '%$search%'
+                                OR npwp LIKE '%$search%'
+                                OR nama_customer LIKE '%$search%'
+                                OR alamat LIKE '%$search%'
+                                OR telepon LIKE '%$search%'
+                                OR kode_pos LIKE '%$search%'
+                                OR passpor LIKE '%$search%'
+                                )";
+              }
+          }
 
+        if (isset($orders)) {
+            if ($orders != '') {
+              $order = $orders;
+              $order_column = ['','kode_customer','npwp','nama_customer','alamat','telepon','kode_pos','passpor'];
+              $order_clm  = $order_column[$order[0]['column']];
+              $order_by   = $order[0]['dir'];
+              $where .= " ORDER BY $order_clm $order_by ";
+            } else {
+              $where .= " ORDER BY id ASC ";
+            }
+          } else {
+            $where .= " ORDER BY id ASC ";
+          }
+          if (isset($LIMIT)) {
+            if ($LIMIT != '') {
+              $where .= ' ' . $LIMIT;
+            }
+          }
+        $index=1;
+        $button="";
+        $fetch = $this->db->query("SELECT * FROM pelanggan $where");
+        $fetch2 = $this->db->query("SELECT * FROM pelanggan");
+        foreach($fetch->result() as $rows){
+            $sub_array=array();
+            $sub_array[]=$index;
+            $sub_array[]=$rows->kode_customer;
+            $sub_array[]=$rows->npwp;
+            $sub_array[]=$rows->nama_customer;
+            $result[]      = $sub_array;
+			$index++;
+        }
+        $output = array(
+        //   "draw"            =>     intval($this->input->post("draw")),
+        //   "recordsFiltered" =>     $fetch2->num_rows(),
+          "data"            =>     $result,
+         
+        );
+        echo json_encode($output);
+
+    }
+
+	public function fetch_claim(){
+		$starts       = $this->input->post("start");
+		$length       = $this->input->post("length");
+		$LIMIT        = "LIMIT $starts, $length ";
+		$draw         = $this->input->post("draw");
+		$search       = $this->input->post("search");
+		$orders       = isset($_POST["order"]) ? $_POST["order"] : ''; 
+		
+		$where ="WHERE 1=1";
+		$searchingColumn;
+		$result=array();
+		if (isset($search)) {
+		  if ($search != '') {
+			 $searchingColumn = $search;
+				$where .= " AND (no_claim LIKE '%$search%'
+								OR tanggal_pengajuan LIKE '%$search%'
+								OR no_do LIKE '%$search%'
+								OR no_po LIKE '%$search%'
+								OR customer LIKE '%$search%'
+								OR barang LIKE '%$search%'
+								OR kuantitas LIKE '%$search%'
+								OR kondisi_barang LIKE '%$search%'
+								OR foto_barang LIKE '%$search%'
+								OR status LIKE '%$search%'
+								OR sales_id LIKE '%$search%'
+								)";
+			  }
+		  }
+	
+		if (isset($orders)) {
+			if ($orders != '') {
+			  $order = $orders;
+			  $order_column = ['no_claim','tanggal_pengajuan','no_do','no_po','customer','barang','kuantitas','kondisi_barang','foto_barang','status','sales_id'];
+			  $order_clm  = $order_column[$order[0]['column']];
+			  $order_by   = $order[0]['dir'];
+			  $where .= " ORDER BY $order_clm $order_by ";
+			} else {
+			  $where .= " ORDER BY id ASC ";
+			}
+		  } else {
+			$where .= " ORDER BY id ASC ";
+		  }
+		  if (isset($LIMIT)) {
+			if ($LIMIT != '') {
+			  $where .= ' ' . $LIMIT;
+			}
+		  }
+		$index=1;
+		$button="";
+		$fetch = $this->db->query("SELECT * from claim $where");
+		$fetch2 = $this->db->query("SELECT * from claim ");
+		foreach($fetch->result() as $rows){
+			
+			$sub_array=array();
+			$sub_array[]=$index;
+			$sub_array[]=$rows->no_claim;
+			$sub_array[]=$rows->tanggal_pengajuan;
+			$sub_array[]=$rows->no_do;
+			$sub_array[]=$rows->no_po;
+			$sub_array[]=$rows->customer;
+			$sub_array[]=$rows->barang;
+			$sub_array[]=$rows->kuantitas;
+			$sub_array[]=$rows->kondisi_barang;
+			$sub_array[]=$rows->foto_barang;
+			$result[]      = $sub_array;
+			$index++;
+		}
+		$output = array(
+		  "draw"            =>     intval($this->input->post("draw")),
+		  "recordsFiltered" =>     $fetch2->num_rows(),
+		  "data"            =>     $result,
+		 
+		);
+		echo json_encode($output);
+	
+	}
 
 
 	public function sendLocation(){
@@ -98,11 +239,13 @@
 			$long = $this->input->post("longitude");
 			$current = $this->input->post("currentloc");
 			$id   = $this->input->post("id");
+			$update_at = $this->input->post("update_lokasi_at");
 
 			$data = array(
 				"latitude" => $lat,
 				"longitude" => $long,
 				"alamatfromapp" => $current,
+				"update_lokasi_at"=>$update_at,
 			);
 			if($lat != "" and $long != ""){
 				$this->db->where('id',$id);

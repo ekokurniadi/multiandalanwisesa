@@ -83,8 +83,8 @@
   </script>
  
  <script>
-        CKEDITOR.replace('alamat_antar');
-        CKEDITOR.replace('alamat_jemput');
+        CKEDITOR.replace('catatan');
+        CKEDITOR.replace('kondisi_barang');
         CKEDITOR.replace('barang_customer');
  </script>
  

@@ -1,80 +1,67 @@
 
- <div class="main-content">
+<div class="main-content">
 <section class="section">
   <div class="section-header">
-    <h1> Pengguna </h1>
+    <h1> Claim </h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item active"><a href="<?php echo base_url(); ?>dashboard"><i class="fa fa-dashboard"></i> Home</a></div>
-      <div class="breadcrumb-item"><a href="#"> Pengguna </a></div>
+      <div class="breadcrumb-item"><a href="#">Claim </a></div>
     </div>
   </div>
 
-  <div class="section-body">
+          <div class="section-body">
             <div class="row">
               <div class="col-12">
                 <div class="card">
                   <div class="card-header">
-                  <div class="container-fluid">
-                  <div class="row">
-                      <div class="col-md-4">
-                        <?php echo anchor(site_url('pengguna/create'),'<i class="fa fa-plus"></i> Add New', 'class="btn btn-icon icon-left btn-primary"'); ?>
-                      </div>
+                  
+                  
+                    <div class="col-md-4">
+                      <?php echo anchor(site_url('claim/create'),'<i class="fa fa-plus"></i> Add New', 'class="btn btn-icon icon-left btn-primary"'); ?>
                     </div>
-                 
-                    
-                    <!-- 0 -->
-                    
-                   <div class="row">
-                    <div class="col-md-12 text-center">
-                      <div style="margin-top: 8px" id="message">
-                      <?php
-                        if (isset($_SESSION['pesan']) && $_SESSION['pesan'] <> '') {
-                        ?>
-                          <div class="alert alert-<?php echo $_SESSION['tipe'] ?> alert-dismissable">
-                            <strong><?php echo $_SESSION['pesan'] ?></strong>
-                            <button class="close" data-dismiss="alert">
-                              <span aria-hidden="true">&times;</span>
-                              <span class="sr-only">Close</span>
-                            </button>
-                          </div>
-                        <?php
-                        }
-                        $_SESSION['pesan'] = '';
 
-                        ?>
+                  <div class="col-md-4 text-center">
+                      <div style="margin-top: 8px" id="message">
+                       <h5> <?php echo $this->session->userdata('message') <> '' ? $this->session->userdata('message') : ''; ?></h5>
                       </div>
                   </div>
-                    </div>
-                   </div>
+
+                  <div class="col-md-1 text-right">
                   </div>
-               
+
+                  <div class="col-md-3 text-right">
+                    
+                  </div>
+
+                  </div>
                   <div class="card-body">
                     <div class="table-responsive">
-                    <table id="example1" class="table" style="width:100%;">
-                          <thead>
-                            <tr>
-                            <th>No</th>
-                            <th>User ID</th>
-                            <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>No. Hp</th>
-                            <th>Foto</th>
-                            <th>Username</th>
-                            <th>Password</th>
-                            <th>Level</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody></tbody>
-                        </table>
-                        <script>
+                    <table id="example1" class="table" style="min-width:100%;">
+                      <thead>
+                        <tr>
+                          <th>No</th>
+		<th>No Claim</th>
+		<th>Tanggal Pengajuan</th>
+		<th>No Do</th>
+		<th>No Po</th>
+		<th>Customer</th>
+		<th>Barang</th>
+		<th>Kuantitas</th>
+		<th>Kondisi Barang</th>
+		<th>Foto Barang</th>
+		<th>Status</th>
+		<th>Sales</th>
+		<th>Catatan</th>
+		<th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table><script>
                           $(document).ready(function() {
                           dataTable = $('#example1').DataTable({
                               "processing": true,
-                              "paging": true,
                               "serverSide": true,
-                              "scrollX": true,
+                              "scrollX": false,
                               "language": {
                                 "infoFiltered": "",
                                 "processing": "",
@@ -85,7 +72,7 @@
                                 [10, 25, 50, 75, 100]
                               ],
                               "ajax": {
-                                url: "<?php echo site_url('pengguna/fetch_data'); ?>",
+                                url: "<?php echo site_url('claim/fetch_data'); ?>",
                                 type: "POST",
                                 dataSrc: "data",
                                 data: function(d) {
@@ -113,9 +100,8 @@
                         </script>
                     </div>
                   </div>
-                  
                   <div class="card-footer text-right">
-                 
+             
                   </div>
                 </div>
               </div>
@@ -125,7 +111,6 @@
         <div class="row">
         <div class="col-md-6">
           
-            
 	    </div>
        
     </div>

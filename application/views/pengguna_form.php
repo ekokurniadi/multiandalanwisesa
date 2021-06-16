@@ -16,7 +16,7 @@
         <div class="card-header">
             <h4>Form Pengguna </h4>
         </div>
-        <form action="<?php echo $action; ?>" method="post" class="form-horizontal">
+        <form action="<?php echo $action; ?>" method="post" class="form-horizontal" enctype="multipart/form-data">
 	   
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">User Id <?php echo form_error('user_id') ?></label>
@@ -49,7 +49,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">Photo <?php echo form_error('photo') ?></label>
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" name="photo" id="photo" placeholder="Photo" value="<?php echo $photo; ?>" />
+                  <input type="file" class="form-control" name="photo" id="photo" placeholder="Photo" value="<?php echo $photo; ?>" />
                 </div>
               </div>
 	   
@@ -63,14 +63,19 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">Password <?php echo form_error('password') ?></label>
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" name="password" id="password" placeholder="Password" value="<?php echo $password; ?>" />
+                  <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="<?php echo $password; ?>" />
                 </div>
               </div>
 	   
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">Level <?php echo form_error('level') ?></label>
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" name="level" id="level" placeholder="Level" value="<?php echo $level; ?>" />
+                 <select name="level" id="level" class="form-control">
+                  <option value="<?= $level?>"><?=$level == "" ? "Choose an option" : $level ?></option>
+                    <?php foreach($this->db->get('level')->result() as $rows):?>
+                      <option value="<?=$rows->level?>"><?=$rows->level?></option>
+                    <?php endforeach;?>
+                 </select>
                 </div>
               </div>
 	   

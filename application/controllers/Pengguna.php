@@ -16,35 +16,85 @@ class Pengguna extends MY_Controller {
 
     public function index()
     {
-        $q = urldecode($this->input->get('q', TRUE));
-        $start = intval($this->input->get('start'));
-        
-        if ($q <> '') {
-            $config['base_url'] = base_url() . 'pengguna/index.dart?q=' . urlencode($q);
-            $config['first_url'] = base_url() . 'pengguna/index.dart?q=' . urlencode($q);
-        } else {
-            $config['base_url'] = base_url() . 'pengguna/index.dart';
-            $config['first_url'] = base_url() . 'pengguna/index.dart';
-        }
-
-        $config['per_page'] = 10;
-        $config['page_query_string'] = TRUE;
-        $config['total_rows'] = $this->Pengguna_model->total_rows($q);
-        $pengguna = $this->Pengguna_model->get_limit_data($config['per_page'], $start, $q);
-
-        $this->load->library('pagination');
-        $this->pagination->initialize($config);
-
-        $data = array(
-            'pengguna_data' => $pengguna,
-            'q' => $q,
-            'pagination' => $this->pagination->create_links(),
-            'total_rows' => $config['total_rows'],
-            'start' => $start,
-        );
         $this->load->view('header');
-        $this->load->view('pengguna_list', $data);
+        $this->load->view('pengguna_list');
         $this->load->view('footer');
+    }
+
+    public function fetch_data(){
+        $starts       = $this->input->post("start");
+        $length       = $this->input->post("length");
+        $LIMIT        = "LIMIT $starts, $length ";
+        $draw         = $this->input->post("draw");
+        $search       = $this->input->post("search")["value"];
+        $orders       = isset($_POST["order"]) ? $_POST["order"] : ''; 
+        
+        $where ="WHERE 1=1";
+        $searchingColumn;
+        $result=array();
+        if (isset($search)) {
+          if ($search != '') {
+             $searchingColumn = $search;
+                $where .= " AND (user_id LIKE '%$search%'
+                                OR nama LIKE '%$search%'
+                                OR alamat LIKE '%$search%'
+                                OR no_hp LIKE '%$search%'
+                                OR level LIKE '%$search%'
+                               
+                                )";
+              }
+          }
+    
+        if (isset($orders)) {
+            if ($orders != '') {
+              $order = $orders;
+              $order_column = ['user_id','nama','alamat','no_hp','level'];
+              $order_clm  = $order_column[$order[0]['column']];
+              $order_by   = $order[0]['dir'];
+              $where .= " ORDER BY $order_clm $order_by ";
+            } else {
+              $where .= " ORDER BY id ASC ";
+            }
+          } else {
+            $where .= " ORDER BY id ASC ";
+          }
+          if (isset($LIMIT)) {
+            if ($LIMIT != '') {
+              $where .= ' ' . $LIMIT;
+            }
+          }
+        $index=1;
+        $button="";
+        $fetch = $this->db->query("SELECT * from pengguna $where");
+        $fetch2 = $this->db->query("SELECT * from pengguna ");
+        foreach($fetch->result() as $rows){
+            $button1= "<a href=".base_url('pengguna/read/'.$rows->id)." class='btn btn-icon icon-left btn-light'><i class='fa fa-eye'></i></a>";
+            $button2= "<a href=".base_url('pengguna/update/'.$rows->id)." class='btn btn-icon icon-left btn-warning'><i class='fa fa-pencil-square-o'></i></a>";
+            $button3 = "<a href=".base_url('pengguna/delete/'.$rows->id)." class='btn btn-icon icon-left btn-danger' onclick='javasciprt: return confirm(\"Are You Sure ?\")''><i class='fa fa-trash'></i></a>";
+            $span    = $rows->status == "1" ? "<button class='btn btn-icon btn-success'><span class='fa fa-check-circle'></span></button>" : "<button class='btn btn-icon btn-danger'><span class='fa fa-exclamation-triangle'></span></button>";
+            $sub_array=array();
+            $sub_array[]=$index;
+            $sub_array[]=$rows->user_id;
+            $sub_array[]=$rows->nama;
+            $sub_array[]=$rows->alamat;
+            $sub_array[]=$rows->no_hp;
+            $sub_array[]="<img src=".base_url().'image/'.$rows->photo." class='img-fluid' width='80px'>";
+            $sub_array[]=$rows->username;
+            $sub_array[]=sha1($rows->password);
+            $sub_array[]=$rows->level;
+            $sub_array[]=$span;
+            $sub_array[]=$button1." ".$button2." ".$button3;
+            $result[]      = $sub_array;
+            $index++;
+        }
+        $output = array(
+          "draw"            =>     intval($this->input->post("draw")),
+          "recordsFiltered" =>     $fetch2->num_rows(),
+          "data"            =>     $result,
+         
+        );
+        echo json_encode($output);
+    
     }
 
     public function read($id) 
@@ -95,6 +145,7 @@ class Pengguna extends MY_Controller {
         $this->load->view('footer');
     }
     
+
     public function create_action() 
     {
         $this->_rules();
@@ -102,21 +153,37 @@ class Pengguna extends MY_Controller {
         if ($this->form_validation->run() == FALSE) {
             $this->create();
         } else {
-            $data = array(
-		'user_id' => $this->input->post('user_id',TRUE),
-		'nama' => $this->input->post('nama',TRUE),
-		'alamat' => $this->input->post('alamat',TRUE),
-		'no_hp' => $this->input->post('no_hp',TRUE),
-		'photo' => $this->input->post('photo',TRUE),
-		'username' => $this->input->post('username',TRUE),
-		'password' => $this->input->post('password',TRUE),
-		'level' => $this->input->post('level',TRUE),
-		'status' => $this->input->post('status',TRUE),
-	    );
+            $this->load->library('upload');
+            $nmfile = "user".time();
+            $config['upload_path']   = './image/profil_user';
+            $config['overwrite']     = true;
+            $config['allowed_types'] = 'gif|jpeg|png|jpg|bmp|PNG|JPEG|JPG';
+            $config['file_name'] = $nmfile;
 
-            $this->Pengguna_model->insert($data);
-            $this->session->set_flashdata('message', 'Create Record Success');
-            redirect(site_url('pengguna'));
+            $this->upload->initialize($config);
+
+            if($_FILES['photo']['name'])
+                {
+                    if($this->upload->do_upload('photo'))
+                    {
+                    $gbr = $this->upload->data();
+                    $data = array(
+                        'photo' => $gbr['file_name'],
+                        'user_id' => $this->input->post('user_id',TRUE),
+                        'nama' => $this->input->post('nama',TRUE),
+                        'alamat' => $this->input->post('alamat',TRUE),
+                        'no_hp' => $this->input->post('no_hp',TRUE),
+                        'username' => $this->input->post('username',TRUE),
+                        'password' => $this->input->post('password',TRUE),
+                        'level' => $this->input->post('level',TRUE),
+                        'status' => $this->input->post('status',TRUE),
+                    );
+
+                    $this->Pengguna_model->insert($data);
+                    $this->session->set_flashdata('message', 'Create Record Success');
+                    redirect(site_url('pengguna'));
+                }
+            }
         }
     }
     
@@ -150,27 +217,59 @@ class Pengguna extends MY_Controller {
     
     public function update_action() 
     {
-        $this->_rules();
+        $this->load->library('upload');
+        $nmfile = "user".time();
+        $config['upload_path']   = './image/profil_user';
+        $config['overwrite']     = true;
+        $config['allowed_types'] = 'gif|jpeg|png|jpg|bmp|PNG|JPEG|JPG';
+        $config['file_name'] = $nmfile;
 
-        if ($this->form_validation->run() == FALSE) {
-            $this->update($this->input->post('id', TRUE));
-        } else {
-            $data = array(
-		'user_id' => $this->input->post('user_id',TRUE),
-		'nama' => $this->input->post('nama',TRUE),
-		'alamat' => $this->input->post('alamat',TRUE),
-		'no_hp' => $this->input->post('no_hp',TRUE),
-		'photo' => $this->input->post('photo',TRUE),
-		'username' => $this->input->post('username',TRUE),
-		'password' => $this->input->post('password',TRUE),
-		'level' => $this->input->post('level',TRUE),
-		'status' => $this->input->post('status',TRUE),
-	    );
+        $this->upload->initialize($config);
+        
+                if(!empty($_FILES['photo']['name']))
+                {  
+                        unlink("./image/profil_user/".$this->input->post('photo'));
 
-            $this->Pengguna_model->update($this->input->post('id', TRUE), $data);
-            $this->session->set_flashdata('message', 'Update Record Success');
-            redirect(site_url('pengguna'));
-        }
+                    if($_FILES['photo']['name'])
+                    {
+                        if($this->upload->do_upload('photo'))
+                        {
+                            $gbr = $this->upload->data();
+                            $data = array(
+                                'photo' => $gbr['file_name'],
+                                'user_id' => $this->input->post('user_id',TRUE),
+                                'nama' => $this->input->post('nama',TRUE),
+                                'alamat' => $this->input->post('alamat',TRUE),
+                                'no_hp' => $this->input->post('no_hp',TRUE),
+                                'username' => $this->input->post('username',TRUE),
+                                'password' => $this->input->post('password',TRUE),
+                                'level' => $this->input->post('level',TRUE),
+                                'status' => $this->input->post('status',TRUE),
+                            );
+                        }
+                    }
+                  
+                    $this->Pengguna_model->update($this->input->post('id', TRUE), $data);
+                    $this->session->set_flashdata('message', 'Update Record Success');
+                    redirect(site_url('pengguna'));
+                }
+                    else
+                        {
+                            $data = array(
+                                'user_id' => $this->input->post('user_id',TRUE),
+                                'nama' => $this->input->post('nama',TRUE),
+                                'alamat' => $this->input->post('alamat',TRUE),
+                                'no_hp' => $this->input->post('no_hp',TRUE),
+                                'username' => $this->input->post('username',TRUE),
+                                'password' => $this->input->post('password',TRUE),
+                                'level' => $this->input->post('level',TRUE),
+                                'status' => $this->input->post('status',TRUE),
+                            );
+                        }
+                    
+                        $this->Pengguna_model->update($this->input->post('id', TRUE), $data);
+                        $this->session->set_flashdata('message', 'Update Record Success');
+                        redirect(site_url('pengguna'));
     }
     
     public function delete($id) 

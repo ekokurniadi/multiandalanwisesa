@@ -26,11 +26,12 @@
         <div class="row">
           <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
             <div class="login-brand">
-            <div class="login-brand">
-              <img src="image/logo_maw.png" alt="logo" width="100"  style="margin-top:0px">
-            </div>
-            <h3 style="color:white;">MULTI ANDALAN WISESA</h3>
-            <p style="color:whitesmoke;text-shadow: 2px 2px black;"></p>
+              <div class="login-brand">
+                <img src="image/logo_maw.png" alt="logo" width="100"  style="margin-top:0px">
+              </div>
+              <h3 style="color:#d29e29;">MULTI ANDALAN</h3>
+              <h3 style="color:#28299f;">WISESA</h3>
+           
             </div>
           
             <div class="card card-primary" style="margin-top:-25px">
