@@ -78,7 +78,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">Foto Barang <?php echo form_error('foto_barang') ?></label>
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" name="foto_barang" id="foto_barang" placeholder="Foto Barang" value="<?php echo $foto_barang; ?>" readonly />
+                <img src="<?php echo base_url().'image/'.$foto_barang ?>" class='img-fluid' alt="photo" width="350px">
                 </div>
               </div>
 	   
@@ -94,12 +94,8 @@
                   <textarea class="form-control" rows="3" name="catatan" id="catatan" placeholder="Kondisi Barang"><?php echo $catatan; ?></textarea>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="int">Sales Id <?php echo form_error('sales_id') ?></label>
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" name="sales_id" id="sales_id" placeholder="Sales Id" value="<?php echo $sales_id; ?>" readonly />
-                </div>
-              </div>
+                  <input type="hidden" class="form-control" name="sales_id" id="sales_id" placeholder="Sales Id" value="<?php echo $sales_id; ?>" readonly />
+             
 	   
      
         <div class="card-footer text-left">

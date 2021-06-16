@@ -106,13 +106,8 @@
                   <textarea class="form-control" rows="3" name="catatan" id="catatan" placeholder="Kondisi Barang"><?php echo $catatan; ?></textarea>
                 </div>
               </div>
+                  <input type="hidden" class="form-control" name="sales_id" id="sales_id" placeholder="Sales Id" value="<?php echo $sales_id; ?>" />
 	   
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="int">Sales <?php echo form_error('sales_id') ?></label>
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" name="sales_id" id="sales_id" placeholder="Sales Id" value="<?php echo $sales_id; ?>" />
-                </div>
-              </div>
 	   
      
         <div class="card-footer text-left">

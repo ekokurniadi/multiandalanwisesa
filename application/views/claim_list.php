@@ -50,7 +50,6 @@
 		<th>Kondisi Barang</th>
 		<th>Foto Barang</th>
 		<th>Status</th>
-		<th>Sales</th>
 		<th>Catatan</th>
 		<th>Action</th>
                         </tr>

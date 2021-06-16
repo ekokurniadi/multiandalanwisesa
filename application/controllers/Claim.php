@@ -89,7 +89,7 @@ class Claim extends MY_Controller {
         $sub_array[]=$rows->kondisi_barang;
         $sub_array[]="<img src=".base_url().'image/'.$rows->foto_barang." class='img-fluid' width='80px'>";
         $sub_array[]=$rows->status;
-        $sub_array[]=$rows->sales_id;
+        // $sub_array[]=$rows->sales_id;
         $sub_array[]=$rows->catatan;
         $sub_array[]=$button1." ".$button2." ".$button3;
         $result[]      = $sub_array;
@@ -391,7 +391,7 @@ function acak($panjang)
 	$this->form_validation->set_rules('kondisi_barang', 'kondisi barang', 'trim|required');
 	$this->form_validation->set_rules('foto_barang', 'foto barang', '');
 	$this->form_validation->set_rules('status', 'status', 'trim|required');
-	$this->form_validation->set_rules('sales_id', 'sales id', 'trim|required');
+	$this->form_validation->set_rules('sales_id', 'sales id', '');
 
 	$this->form_validation->set_rules('id', 'id', 'trim');
 	$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
