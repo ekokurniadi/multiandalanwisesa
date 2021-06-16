@@ -232,6 +232,83 @@
 	
 	}
 
+	public function saveClaim(){
+		if($_POST){
+			$image = $_POST['image'];
+			$name = $_POST['name'];
+			$idSales = $_POST['sales_id'];
+			$folderPath="./image/".$name;
+			$tanggal_pengajuan = $this->input->post('tanggal_pengajuan');
+			$no_do = $this->input->post('no_do');
+			$no_po = $this->input->post('no_po');
+			$customer = $this->input->post('customer');
+			$kuantitas = $this->input->post('kuantitas');
+			$barang = $this->input->post('barang');
+			$kondisi_barang = $this->input->post('kondisi_barang');
+			$status = $this->input->post('status');
+			$idClaim = $this->acak(11);
+			$realImage = base64_decode($image);
+			$files = file_put_contents("./image/".$name, $realImage);
+			$data = array(
+				"no_claim"=>$idClaim,
+				"tanggal_pengajuan"=>$tanggal_pengajuan,
+				"no_do"=>$no_do,
+				"no_po"=>$no_po,
+				"customer"=>$customer,
+				"barang"=>$barang,
+				"kuantitas"=>$kuantitas,
+				"kondisi_barang"=>$kondisi_barang,
+				"foto_barang"=>$name,
+				"status"=>$status,
+				"sales_id"=>$idSales,
+				"catatan"=>"",
+			);
+			$save = $this->db->insert('claim',$data);
+			
+			if($save){
+				echo json_encode(array(
+					"status"=>200,
+					"message"=>"Berhasil melakukan pengajuan Claim",
+				));
+			}else{
+				echo json_encode(array(
+					"status"=>500,
+					"message"=>"Gagal melakukan pengajuan Claim, mohon coba kembali beberapa saat lagi.",
+				));
+			}
+		}
+	}
+
+	function acak($panjang)
+	{
+	  $karakter= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
+	  $string = '';
+	  for ($i = 0; $i < $panjang; $i++) {
+		$pos = rand(0, strlen($karakter)-1);
+		$string .= $karakter{$pos};
+	  }
+	  return $string;
+	}
+
+	public function uploadFotoPanel(){
+	
+		$id = $_POST['id'];
+		$image = $_POST['image'];
+    	$name = $_POST['name'];
+		$folderPath="./image/".$name;
+    	$realImage = base64_decode($image);
+   		$files = file_put_contents("./image/".$name, $realImage);
+		$data = array(
+            "photo_panel"=> $name,	
+        );
+		$this->db->where('task_id',$id);
+        $this->db->update('work_order',$data);
+		echo json_encode(array(
+			"status"=>"1",
+			"pesan"=>"Foto berhasil di Upload",  
+        ));
+    }
+
 
 	public function sendLocation(){
 		if($_POST){
