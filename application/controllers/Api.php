@@ -309,6 +309,47 @@
         ));
     }
 
+	
+	public function cek_jarak()
+	{
+		if ($_POST) {
+			$jarak = $this->input->post('jarak');
+			$pd = $this->input->post('pd');
+			$cek = $this->db->get_where('setting_jarak', array('id'=>1))->row();
+			if ($cek->jarak_max > $jarak && $pd == false) {
+
+				//TODO : Fungsi simpan data absen disini
+				if ($jarak > $cek->standar_km) {
+					$jarak = ceil($jarak);
+					$sisa = $jarak - $cek->standar_km;
+					$n_sisa = $sisa * $cek->per_km;
+					$total_harga = $cek->standar_harga + $n_sisa;
+					$result = array(
+						'status' => "1",
+						'pesan' => "success",
+						'total_harga' => "$total_harga",
+					);
+					echo json_encode($result);
+				} else {
+					$result = array(
+						'status' => "1",
+						'pesan' => "success",
+						'total_harga' => "$cek->standar_harga",
+					);
+					echo json_encode($result);
+				}
+				
+			} else {
+				$result = array(
+					'status' => "0",
+					'pesan' => "Radius Absensi tidak boleh melebihi $cek->jarak_max M"
+				);
+				echo json_encode($result);
+			}
+		}
+
+	}
+
 
 	public function sendLocation(){
 		if($_POST){
