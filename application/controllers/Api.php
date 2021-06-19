@@ -310,44 +310,115 @@
     }
 
 	
-	public function cek_jarak()
+	public function absensi()
 	{
 		if ($_POST) {
 			$jarak = $this->input->post('jarak');
-			$pd = $this->input->post('pd');
-			$cek = $this->db->get_where('setting_jarak', array('id'=>1))->row();
-			if ($cek->jarak_max > $jarak && $pd == false) {
+			$pd = $this->db->query("SELECT * from pengguna where id='$sales'")->row()->pd;
+			$sales = $this->input->post('id_sales');
+			$tanggal = substr($this->input->post('tanggal'),0,10);
+			$jam = substr($this->input->post('tanggal'),11,5);
+			$image = $_POST['image'];
+    		$name = $_POST['name'];
 
-				//TODO : Fungsi simpan data absen disini
-				if ($jarak > $cek->standar_km) {
-					$jarak = ceil($jarak);
-					$sisa = $jarak - $cek->standar_km;
-					$n_sisa = $sisa * $cek->per_km;
-					$total_harga = $cek->standar_harga + $n_sisa;
-					$result = array(
-						'status' => "1",
-						'pesan' => "success",
-						'total_harga' => "$total_harga",
+		
+			$cek = $this->db->get_where('setting_jarak', array('id'=>1))->row();
+			$cek_absen = $this->db->get_where('absen',array("id_sales"=>$sales,"tanggal"=>$tanggal));
+			// echo json_encode(array(
+			// 	"tanggal"=>$tanggal,
+			// 	"jam"=>$jam,
+			// 	"jarak"=>$jarak
+			// ));
+			$data=array();
+			if($cek->jarak_max >= $jarak && $pd == 0){
+				if($cek_absen->num_rows() <= 0){
+					$realImage = base64_decode($image);
+					$files = file_put_contents("./image/absen/".$name, $realImage);
+					$data = array(
+						"tanggal"=>$tanggal,
+						"jam"=>$jam,
+						"id_sales"=>$sales,
+						"foto"=>$name
 					);
-					echo json_encode($result);
-				} else {
-					$result = array(
-						'status' => "1",
-						'pesan' => "success",
-						'total_harga' => "$cek->standar_harga",
-					);
-					echo json_encode($result);
+					$insert = $this->db->insert('absen',$data);
+					if($insert){
+						echo json_encode(array(
+							"status"=>200,
+							"pesan"=>"Absen berhasil"
+						));
+					}else{
+						echo json_encode(array(
+							"status"=>"false",
+							"pesan"=>"Absen gagal, mohon coba kembali"
+						));
+					}
+				}else{
+					echo json_encode(array(
+						"status"=>"false",
+						"pesan"=>"Anda sudah absen pada hari ini"
+					));
 				}
 				
-			} else {
-				$result = array(
-					'status' => "0",
-					'pesan' => "Radius Absensi tidak boleh melebihi $cek->jarak_max M"
-				);
-				echo json_encode($result);
+			}elseif($cek->jarak_max < $jarak && $pd == 0){
+				echo json_encode(array(
+					"status"=>"false",
+					"pesan"=>"Jarak terlalu jauh untuk melakukan absensi"
+				));
+			}elseif($pd == 1){
+				if($cek_absen->num_rows() <= 0){
+					$realImage = base64_decode($image);
+					$files = file_put_contents("./image/absen/".$name, $realImage);
+					$data = array(
+						"tanggal"=>$tanggal,
+						"jam"=>$jam,
+						"id_sales"=>$sales,
+						"foto"=>$name
+					);
+					$insert = $this->db->insert('absen',$data);
+					if($insert){
+						echo json_encode(array(
+							"status"=>200,
+							"pesan"=>"Absen berhasil"
+						));
+					}else{
+						echo json_encode(array(
+							"status"=>"false",
+							"pesan"=>"Absen gagal, mohon coba kembali"
+						));
+					}
+				}else{
+					echo json_encode(array(
+						"status"=>"false",
+						"pesan"=>"Anda sudah absen pada hari ini"
+					));
+				}
 			}
+			// if ($cek->jarak_max > $jarak && $pd == false) {
+
+				
+			// } else if($cek->jarak_max > $jarak && $pd == true){
+			// 	$result = array(
+			// 		'status' => "0",
+			// 		'pesan' => "Radius Absensi tidak boleh melebihi $cek->jarak_max M"
+			// 	);
+			// 	echo json_encode($result);
+			// }else{
+			// 	$result = array(
+			// 		'status' => "0",
+			// 		'pesan' => "Radius Absensi tidak boleh melebihi $cek->jarak_max M"
+			// 	);
+			// 	echo json_encode($result);
+			// }
 		}
 
+	}
+
+	public function getLokasiKantor(){
+		$query = $this->db->query("select value as latitude,lokasi as longitude from setting where judul = 'koordinat'")->row();
+		echo json_encode(array(
+			"latitude"=>$query->latitude,
+			"longitude"=>$query->longitude,
+		));
 	}
 
 
