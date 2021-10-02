@@ -3,117 +3,227 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Jadwal extends MY_Controller {
+class Jadwal extends MY_Controller
+{
 
-    protected $access = array('Admin', 'Pimpinan','Finance');
-    
+    // protected $access = array('Admin', 'Pimpinan','Finance');
+
     function __construct()
     {
         parent::__construct();
         $this->load->model('Jadwal_model');
+        $this->load->model('Notif_model');
         $this->load->library('form_validation');
     }
 
     public function index()
     {
-        $q = urldecode($this->input->get('q', TRUE));
-        $start = intval($this->input->get('start'));
-        
-        if ($q <> '') {
-            $config['base_url'] = base_url() . 'jadwal/index.dart?q=' . urlencode($q);
-            $config['first_url'] = base_url() . 'jadwal/index.dart?q=' . urlencode($q);
-        } else {
-            $config['base_url'] = base_url() . 'jadwal/index.dart';
-            $config['first_url'] = base_url() . 'jadwal/index.dart';
-        }
-
-        $config['per_page'] = 10;
-        $config['page_query_string'] = TRUE;
-        $config['total_rows'] = $this->Jadwal_model->total_rows($q);
-        $jadwal = $this->Jadwal_model->get_limit_data($config['per_page'], $start, $q);
-
-        $this->load->library('pagination');
-        $this->pagination->initialize($config);
-
-        $data = array(
-            'jadwal_data' => $jadwal,
-            'q' => $q,
-            'pagination' => $this->pagination->create_links(),
-            'total_rows' => $config['total_rows'],
-            'start' => $start,
-        );
-        $this->load->view('header');
+        $data['session'] = $_GET['session'];
+        $_SESSION['id'] = $_GET['session'];
+        $this->load->view('header2');
         $this->load->view('jadwal_list', $data);
-        $this->load->view('footer');
+        $this->load->view('footer2');
     }
 
-    public function read($id) 
+    public function fetch_data()
+    {
+        $starts       = $this->input->post("start");
+        $length       = $this->input->post("length");
+        $LIMIT        = "LIMIT $starts, $length ";
+        $draw         = $this->input->post("draw");
+        $search       = $this->input->post("search")["value"];
+        $orders       = isset($_POST["order"]) ? $_POST["order"] : '';
+        $session      = $_POST['session'];
+
+
+        $where = "WHERE 1=1 AND id_sales='$session'";
+        $where2 = "WHERE 1=1 AND id_sales='$session'";
+        // $searchingColumn;
+        $result = array();
+        if (isset($search)) {
+            if ($search != '') {
+                $searchingColumn = $search;
+                $where .= " AND (customer LIKE '%$search%'
+                            )";
+                $where2 .= " AND (customer LIKE '%$search%'
+                            )";
+            }
+        }
+
+        if (isset($orders)) {
+            if ($orders != '') {
+                $order = $orders;
+                $order_column = ['id_sales', 'customer'];
+                $order_clm  = $order_column[$order[0]['column']];
+                $order_by   = $order[0]['dir'];
+                $where .= " ORDER BY $order_clm $order_by ";
+                $where2 .= " ORDER BY $order_clm $order_by ";
+            } else {
+                $where .= " ORDER BY id ASC ";
+                $where2 .= " ORDER BY id ASC ";
+            }
+        } else {
+            $where .= " ORDER BY id ASC ";
+            $where2 .= " ORDER BY id ASC ";
+        }
+        if (isset($LIMIT)) {
+            if ($LIMIT != '') {
+                $where .= ' ' . $LIMIT;
+                $where2 .= ' ' . $LIMIT;
+            }
+        }
+        $index = 1;
+        $button = "";
+        $fetch = $this->db->query("SELECT * from jadwal $where");
+        $fetch2 = $this->db->query("SELECT * from jadwal $where2");
+        foreach ($fetch->result() as $rows) {
+            $button1 = "<a href=" . base_url('jadwal/read/' . $rows->id) . " class='btn btn-icon icon-left btn-light'><i class='fa fa-eye'></i></a>";
+            $button2 = "<a href=" . base_url('jadwal/update/' . $rows->id) . " class='btn btn-icon icon-left btn-warning'><i class='fa fa-pencil-square-o'></i></a>";
+            $button3 = "<a href=" . base_url('jadwal/delete/' . $rows->id) . " class='btn btn-icon icon-left btn-danger' onclick='javasciprt: return confirm(\"Are You Sure ?\")''><i class='fa fa-trash'></i></a>";
+            $sub_array = array();
+            $sub_array[] = $index;
+            $sub_array[] = $rows->customer;
+            $sub_array[] = $button1 . " " . $button2 . " " . $button3;
+            $result[]      = $sub_array;
+            $index++;
+        }
+        $output = array(
+            "draw"            =>     intval($this->input->post("draw")),
+            "recordsFiltered" =>     $fetch2->num_rows(),
+            "data"            =>     $result,
+
+        );
+        echo json_encode($output);
+    }
+
+    public function read($id)
     {
         $row = $this->Jadwal_model->get_by_id($id);
         if ($row) {
             $data = array(
-		'id' => $row->id,
-		'id_sales' => $row->id_sales,
-		'customer' => $row->customer,
-		'tanggal' => $row->tanggal,
-		'jam' => $row->jam,
-		'jenis_kunjungan' => $row->jenis_kunjungan,
-		'status' => $row->status,
-		'catatan' => $row->catatan,
-	    );
-            $this->load->view('header');
-            $this->load->view('jadwal_read', $data);
-            $this->load->view('footer');
+                'button' => 'Update',
+                'action' => site_url('jadwal/update_action'),
+                'mode' => "read",
+                'id' => set_value('id', $row->id),
+                'id_jadwal' => set_value('id_jadwal', $row->id_jadwal),
+                'id_sales' => set_value('id_sales', $row->id_sales),
+                'customer' => set_value('customer', $row->customer),
+            );
+            $this->load->view('header2');
+            $this->load->view('jadwal_form', $data);
+            $this->load->view('footer2');
         } else {
             $this->session->set_flashdata('message', 'Record Not Found');
             redirect(site_url('jadwal'));
         }
     }
 
-    public function create() 
+    public function kode()
     {
+        date_default_timezone_set('Asia/Jakarta');
+        $day = date('d');
+        $month = date('m');
+        $year = substr(date('Y'), -2);
+        $get_data = $this->db
+            ->from('jadwal')
+            ->limit(1)
+            ->order_by('id', 'desc')
+            ->get();
+
+        if ($get_data->num_rows() > 0) {
+            $row        = $get_data->row();
+            $kode_jasa = substr($row->id_jadwal, -6);
+            $new_kode = $day . $month . "SPA" . $year . sprintf("%'.06d", $kode_jasa + 1);
+        } else {
+            $new_kode   = $day . $month . "SPA" . $year . "000001";
+        }
+        return strtoupper($new_kode);
+    }
+
+    public function create()
+    {
+
         $data = array(
             'button' => 'Create',
             'action' => site_url('jadwal/create_action'),
-	    'id' => set_value('id'),
-	    'id_sales' => set_value('id_sales'),
-	    'customer' => set_value('customer'),
-	    'tanggal' => set_value('tanggal'),
-	    'jam' => set_value('jam'),
-	    'jenis_kunjungan' => set_value('jenis_kunjungan'),
-	    'status' => set_value('status'),
-	    'catatan' => set_value('catatan'),
-	);
+            'mode' => "create",
+            'id' => set_value('id'),
+            'id_jadwal' => $this->kode(),
+            'id_sales' => set_value('id_sales', $_SESSION['id']),
+            'customer' => set_value('customer'),
+        );
 
-        $this->load->view('header');
+        $this->load->view('header2');
         $this->load->view('jadwal_form', $data);
-        $this->load->view('footer');
+        $this->load->view('footer2');
     }
-    
-    public function create_action() 
+
+    public function create_action()
     {
-        $this->_rules();
+        date_default_timezone_set('Asia/Bangkok');
+        $header = [
+            'id_jadwal' => $_POST['id_jadwal'],
+            'id_sales' => $_POST['id_sales'],
+            'customer' => $_POST['customer'],
+            'status' => "New",
 
-        if ($this->form_validation->run() == FALSE) {
-            $this->create();
-        } else {
-            $data = array(
-		'id_sales' => $this->input->post('id_sales',TRUE),
-		'customer' => $this->input->post('customer',TRUE),
-		'tanggal' => $this->input->post('tanggal',TRUE),
-		'jam' => $this->input->post('jam',TRUE),
-		'jenis_kunjungan' => $this->input->post('jenis_kunjungan',TRUE),
-		'status' => $this->input->post('status',TRUE),
-		'catatan' => $this->input->post('catatan',TRUE),
-	    );
-
-            $this->Jadwal_model->insert($data);
-            $this->session->set_flashdata('message', 'Create Record Success');
-            redirect(site_url('jadwal'));
+        ];
+        $detail = $_POST['detail'];
+        foreach ($detail as $dj) {
+            $ins_[] = [
+                'id_jadwal' => $_POST['id_jadwal'],
+                'tanggal' => $dj['tanggal'],
+                'jam' => $dj['jam'],
+                'status' => "New",
+                'jenis_kunjungan' => $dj['jenis_kunjungan'],
+                'perjalanan_dinas' => $dj['perjalanan_dinas'],
+                'hasil' => $dj['hasil'] == "" ? "" : $dj['hasil'],
+            ];
         }
+
+        $this->db->trans_begin();
+        $cek = $this->db->get_where('jadwal', array('id_jadwal' => $_POST['id_jadwal']));
+        if ($cek->num_rows() <= 0) {
+            $this->db->insert('jadwal', $header);
+        }
+        $this->db->where('id_jadwal', $_POST['id_jadwal']);
+        $this->db->delete('jadwal_detail');
+        $this->db->insert_batch('jadwal_detail', $ins_);
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $response = [
+                'status' => "ERROR",
+                "pesan" => "Terjadi kesalahan",
+            ];
+        } else {
+            $this->db->trans_commit();
+            $sales = $this->db->get_where('pengguna', array('id' => $_POST['id_sales']));
+            $title = "Notifikasi Jadwal";
+            $body = "" . $sales->row()->nama . " sudah membuat jadwal kunjungan";
+            $screen = "list_trx";
+            $server_key = get_setting('server_fcm_app');
+            $owner = $this->db->get_where('pengguna', array('level' => 'Owner'));
+            foreach ($owner->result() as $rows) {
+                $this->Notif_model->send_notif($server_key, $rows->token, $title, $body, $screen);
+                $insert_notif = array(
+                    "user_id" => $rows->id,
+                    "pesan" => $body,
+                    "status" => "0",
+                    "created" => date('Y-m-d H:i:s'),
+                    "deleted" => "0"
+                );
+                $ins = $this->db->insert("notifikasi", $insert_notif);
+            }
+            $response = [
+                'status' => "sukses",
+                'link' => base_url('jadwal?session=' . $_POST['id_sales'])
+            ];
+            $this->session->set_flashdata('message', 'Create Record Success');
+        }
+        echo json_encode($response);
     }
-    
-    public function update($id) 
+
+    public function update($id)
     {
         $row = $this->Jadwal_model->get_by_id($id);
 
@@ -121,25 +231,22 @@ class Jadwal extends MY_Controller {
             $data = array(
                 'button' => 'Update',
                 'action' => site_url('jadwal/update_action'),
-		'id' => set_value('id', $row->id),
-		'id_sales' => set_value('id_sales', $row->id_sales),
-		'customer' => set_value('customer', $row->customer),
-		'tanggal' => set_value('tanggal', $row->tanggal),
-		'jam' => set_value('jam', $row->jam),
-		'jenis_kunjungan' => set_value('jenis_kunjungan', $row->jenis_kunjungan),
-		'status' => set_value('status', $row->status),
-		'catatan' => set_value('catatan', $row->catatan),
-	    );
-            $this->load->view('header');
+                'mode' => "edit",
+                'id' => set_value('id', $row->id),
+                'id_jadwal' => set_value('id_jadwal', $row->id_jadwal),
+                'id_sales' => set_value('id_sales', $row->id_sales),
+                'customer' => set_value('customer', $row->customer),
+            );
+            $this->load->view('header2');
             $this->load->view('jadwal_form', $data);
-            $this->load->view('footer');
+            $this->load->view('footer2');
         } else {
             $this->session->set_flashdata('message', 'Record Not Found');
             redirect(site_url('jadwal'));
         }
     }
-    
-    public function update_action() 
+
+    public function update_action()
     {
         $this->_rules();
 
@@ -147,22 +254,17 @@ class Jadwal extends MY_Controller {
             $this->update($this->input->post('id', TRUE));
         } else {
             $data = array(
-		'id_sales' => $this->input->post('id_sales',TRUE),
-		'customer' => $this->input->post('customer',TRUE),
-		'tanggal' => $this->input->post('tanggal',TRUE),
-		'jam' => $this->input->post('jam',TRUE),
-		'jenis_kunjungan' => $this->input->post('jenis_kunjungan',TRUE),
-		'status' => $this->input->post('status',TRUE),
-		'catatan' => $this->input->post('catatan',TRUE),
-	    );
+                'id_sales' => $this->input->post('id_sales', TRUE),
+                'customer' => $this->input->post('customer', TRUE),
+            );
 
             $this->Jadwal_model->update($this->input->post('id', TRUE), $data);
             $this->session->set_flashdata('message', 'Update Record Success');
             redirect(site_url('jadwal'));
         }
     }
-    
-    public function delete($id) 
+
+    public function delete($id)
     {
         $row = $this->Jadwal_model->get_by_id($id);
 
@@ -176,24 +278,18 @@ class Jadwal extends MY_Controller {
         }
     }
 
-    public function _rules() 
+    public function _rules()
     {
-	$this->form_validation->set_rules('id_sales', 'id sales', 'trim|required');
-	$this->form_validation->set_rules('customer', 'customer', 'trim|required');
-	$this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
-	$this->form_validation->set_rules('jam', 'jam', 'trim|required');
-	$this->form_validation->set_rules('jenis_kunjungan', 'jenis kunjungan', 'trim|required');
-	$this->form_validation->set_rules('status', 'status', 'trim|required');
-	$this->form_validation->set_rules('catatan', 'catatan', 'trim|required');
+        $this->form_validation->set_rules('id_sales', 'id sales', 'trim|required');
+        $this->form_validation->set_rules('customer', 'customer', 'trim|required');
 
-	$this->form_validation->set_rules('id', 'id', 'trim');
-	$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
+        $this->form_validation->set_rules('id', 'id', 'trim');
+        $this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
     }
-
 }
 
 /* End of file Jadwal.php */
 /* Location: ./application/controllers/Jadwal.php */
 /* Please DO NOT modify this information : */
-/* Generated by Harviacode Codeigniter CRUD Generator 2021-06-01 09:13:30 */
+/* Generated by Harviacode Codeigniter CRUD Generator 2021-08-06 17:48:45 */
 /* http://harviacode.com */

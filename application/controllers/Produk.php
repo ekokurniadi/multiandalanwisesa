@@ -56,7 +56,7 @@ class Produk extends MY_Controller {
         $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
         
         $where ="WHERE 1=1";
-        $searchingColumn;
+        // $searchingColumn;
         $result=array();
         if (isset($search)) {
           if ($search != '') {
@@ -125,7 +125,7 @@ class Produk extends MY_Controller {
       $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
       
       $where ="WHERE 1=1";
-      $searchingColumn;
+      // $searchingColumn;
       $result=array();
       if (isset($search)) {
         if ($search != '') {
@@ -168,9 +168,9 @@ class Produk extends MY_Controller {
         
           $sub_array=array();
           $sub_array[]=$index;
-          $sub_array[]=$rows->kode_barang;
-          $sub_array[]=$rows->nama_barang;
-          $sub_array[]=number_format($rows->harga_satuan,0,'.',',');
+          $sub_array[]=$rows->kode_barang."<br>".$rows->nama_barang."<br>".number_format($rows->harga_satuan,0,'.',',');
+          // $sub_array[]=$rows->nama_barang;
+          // $sub_array[]=number_format($rows->harga_satuan,0,'.',',');
           $result[]      = $sub_array;
           $index++;
       }
@@ -303,7 +303,7 @@ class Produk extends MY_Controller {
           }
           if (!$this->db->trans_status()) {
             $this->db->trans_rollback();
-            $_SESSION['pesan']   = $pesan;
+            $_SESSION['pesan']   = "Berhasil";
             $_SESSION['tipe']   = "success";
             $rsp = [
               'status' => 'sukses',

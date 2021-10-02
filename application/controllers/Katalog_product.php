@@ -56,7 +56,7 @@ class Katalog_product extends MY_Controller {
         $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
         
         $where ="WHERE 1=1";
-        $searchingColumn;
+        // $searchingColumn;
         $result=array();
         if (isset($search)) {
           if ($search != '') {

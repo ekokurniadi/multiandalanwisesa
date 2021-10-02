@@ -1,114 +1,98 @@
+<div class="main">
+  <section class="section">
+   
 
- <div class="main-content">
-<section class="section">
-  <div class="section-header">
-    <h1> Jadwal </h1>
-    <div class="section-header-breadcrumb">
-      <div class="breadcrumb-item active"><a href="<?php echo base_url(); ?>dashboard"><i class="fa fa-dashboard"></i> Home</a></div>
-      <div class="breadcrumb-item"><a href="#"> Jadwal </a></div>
-    </div>
-  </div>
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
 
-          <div class="section-body">
-            <div class="row">
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-header">
-                  
-                    <!-- 0 -->
-                    <div class="col-md-4">
-                      <?php echo anchor(site_url('jadwal/create'),'<i class="fa fa-plus"></i> Add New', 'class="btn btn-icon icon-left btn-primary"'); ?>
-                    </div>
 
-                  <div class="col-md-4 text-center">
-                      <div style="margin-top: 8px" id="message">
-                       <h5> <?php echo $this->session->userdata('message') <> '' ? $this->session->userdata('message') : ''; ?></h5>
-                      </div>
-                  </div>
+              <div class="col-md-4">
+                <?php echo anchor(site_url('jadwal/create'), '<i class="fa fa-plus"></i> Add New', 'class="btn btn-icon icon-left btn-primary"'); ?>
+              </div>
 
-                  <div class="col-md-1 text-right">
-                  </div>
-
-                  <div class="col-md-3 text-right">
-                     <form action="<?php echo site_url('jadwal/index'); ?>" class="form-inline" method="get">
-                          <div class="input-group">
-                          <input type="text" class="form-control" name="q" value="<?php echo $q; ?>" placeholder="Enter Keyword">
-                          <span class="input-group-btn">
-                              <?php 
-                                  if ($q <> '')
-                                  {
-                                      ?>
-                                      <a href="<?php echo site_url('jadwal'); ?>" class="btn btn-warning"><span class="fa fa-close"> </span> Reset</a>
-                                      <?php
-                                  }
-                              ?>
-                            <button class="btn btn-primary" type="submit"><span class="fa fa-search"> </span> Search</button>
-                          </span>
-                          </div>
-                      </form>
-                  </div>
-
-                  </div>
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table table-bordered table-md" id="table-1">
-                      <thead>
-                      <tr>
-                          <th>No</th>
-		<th>Id Sales</th>
-		<th>Customer</th>
-		<th>Tanggal</th>
-		<th>Jam</th>
-		<th>Jenis Kunjungan</th>
-		<th>Status</th>
-		<th>Catatan</th>
-		<th>Action</th>
-                    </tr>
-                    </thead><?php
-                    foreach ($jadwal_data as $jadwal)
-                    {
-                        ?>
-                          <tbody>
-                          <tr>
-			<td width="80px"><?php echo ++$start ?></td>
-			<td><?php echo $jadwal->id_sales ?></td>
-			<td><?php echo $jadwal->customer ?></td>
-			<td><?php echo $jadwal->tanggal ?></td>
-			<td><?php echo $jadwal->jam ?></td>
-			<td><?php echo $jadwal->jenis_kunjungan ?></td>
-			<td><?php echo $jadwal->status ?></td>
-			<td><?php echo $jadwal->catatan ?></td>
-			<td style="text-align:center" width="200px">
-				<?php 
-				echo anchor(site_url('jadwal/read/'.$jadwal->id),'<i class="fa fa-eye"></i>',array('title'=>'detail','class'=>'btn btn-icon icon-left btn-light')); 
-				echo '  '; 
-				echo anchor(site_url('jadwal/update/'.$jadwal->id),'<i class="fa fa-pencil-square-o"></i>',array('title'=>'edit','class'=>'btn btn-icon icon-left btn-warning')); 
-				echo '  '; 
-				echo anchor(site_url('jadwal/delete/'.$jadwal->id),'<i class="fa fa-trash-o"></i>','title="delete" class="btn btn-icon icon-left btn-danger" onclick="javasciprt: return confirm(\'Are You Sure ?\')"'); 
-				?>
-			</td>
-		</tr></tbody>
-                          <?php
-                      }
-                      ?>
-                    
-                    </table>
-                    </div>
-                  </div>
-                  <div class="card-footer text-right">
-                  <?php echo $pagination ?>
-                  </div>
+              <div class="col-md-4 text-center">
+                <div style="margin-top: 8px" id="message">
+                  <h5> <?php echo $this->session->userdata('message') <> '' ? $this->session->userdata('message') : ''; ?></h5>
                 </div>
               </div>
+
+              <div class="col-md-1 text-right">
+              </div>
+
+              <div class="col-md-3 text-right">
+
+              </div>
+
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table id="example1" class="table" style="min-width:100%;">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Customer</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <script>
+                  $(document).ready(function() {
+                    dataTable = $('#example1').DataTable({
+                      "processing": true,
+                      "serverSide": true,
+                      "scrollX": false,
+                      "language": {
+                        "infoFiltered": "",
+                        "processing": "",
+                      },
+                      "order": [],
+                      "lengthMenu": [
+                        [10, 25, 50, 75, 100],
+                        [10, 25, 50, 75, 100]
+                      ],
+                      "ajax": {
+                        url: "<?php echo site_url('jadwal/fetch_data'); ?>",
+                        type: "POST",
+                        dataSrc: "data",
+                        data: function(d) {
+                          d.session = '<?php echo $_GET['session']?>'
+                        },
+                      },
+                      "columnDefs": [{
+                        "targets": [0],
+                        "className": 'text-center'
+                      }, ],
+                    });
+                    dataTable.on('draw.dt', function() {
+                      var info = dataTable.page.info();
+                      dataTable.column(0, {
+                        search: 'applied',
+                        order: 'applied',
+                        page: 'applied'
+                      }).nodes().each(function(cell, i) {
+                        cell.innerHTML = i + 1 + info.start + ".";
+                      });
+                    });
+                  });
+                </script>
+              </div>
+            </div>
+            <div class="card-footer text-right">
+
             </div>
           </div>
-        </section>
-        <div class="row">
-        <div class="col-md-6">
-            <a href="#" class="btn btn-primary">Total Data : <?php echo $total_rows ?></a>
-            
-	    </div>
-       
-    </div>
+        </div>
       </div>
-      
+    </div>
+  </section>
+  <div class="row">
+    <div class="col-md-6">
+
+    </div>
+
+  </div>
+</div>

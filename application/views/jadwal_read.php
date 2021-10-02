@@ -32,42 +32,6 @@
                 </div>
               </div>
 	   
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="date">Tanggal <?php echo form_error('tanggal') ?></label>
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" name="tanggal" id="tanggal" placeholder="Tanggal" value="<?php echo $tanggal; ?>" readonly />
-                </div>
-              </div>
-	   
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="time">Jam <?php echo form_error('jam') ?></label>
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" name="jam" id="jam" placeholder="Jam" value="<?php echo $jam; ?>" readonly />
-                </div>
-              </div>
-	   
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="varchar">Jenis Kunjungan <?php echo form_error('jenis_kunjungan') ?></label>
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" name="jenis_kunjungan" id="jenis_kunjungan" placeholder="Jenis Kunjungan" value="<?php echo $jenis_kunjungan; ?>" readonly />
-                </div>
-              </div>
-	   
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="varchar">Status <?php echo form_error('status') ?></label>
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" name="status" id="status" placeholder="Status" value="<?php echo $status; ?>" readonly />
-                </div>
-              </div>
-	      
-            <div class="card-body">
-              <div class="form-group">
-                <label class="col-sm-2 control-label" for="catatan">Catatan <?php echo form_error('catatan') ?></label>
-                <div class="col-sm-12">
-                    <textarea class="form-control" rows="3" name="catatan" id="catatan" placeholder="Catatan"><?php echo $catatan; ?></textarea>
-                </div>
-              </div>
-	   
      
         <div class="card-footer text-left">
         <input type="hidden" name="id" value="<?php echo $id; ?>" /> 

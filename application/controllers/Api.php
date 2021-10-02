@@ -98,7 +98,7 @@
         $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
         
         $where ="WHERE 1=1 ";
-        $searchingColumn;
+        // $searchingColumn;
         $result=array();
         if (isset($search)) {
           if ($search != '') {
@@ -155,16 +155,16 @@
 
     }
 
-	public function fetch_claim(){
+	public function getClaim(){
 		$starts       = $this->input->post("start");
 		$length       = $this->input->post("length");
 		$LIMIT        = "LIMIT $starts, $length ";
 		$draw         = $this->input->post("draw");
-		$search       = $this->input->post("search");
+		$search       = $this->input->post("filter");
 		$orders       = isset($_POST["order"]) ? $_POST["order"] : ''; 
 		
 		$where ="WHERE 1=1";
-		$searchingColumn;
+		// $searchingColumn;
 		$result=array();
 		if (isset($search)) {
 		  if ($search != '') {
@@ -231,6 +231,8 @@
 		echo json_encode($output);
 	
 	}
+
+
 
 	public function saveClaim(){
 		if($_POST){
@@ -314,8 +316,8 @@
 	{
 		if ($_POST) {
 			$jarak = $this->input->post('jarak');
-			$pd = $this->db->query("SELECT * from pengguna where id='$sales'")->row()->pd;
 			$sales = $this->input->post('id_sales');
+			$pd = $this->db->query("SELECT * from pengguna where id='$sales'")->row()->pd;
 			$tanggal = substr($this->input->post('tanggal'),0,10);
 			$jam = substr($this->input->post('tanggal'),11,5);
 			$image = $_POST['image'];
@@ -324,13 +326,7 @@
 		
 			$cek = $this->db->get_where('setting_jarak', array('id'=>1))->row();
 			$cek_absen = $this->db->get_where('absen',array("id_sales"=>$sales,"tanggal"=>$tanggal));
-			// echo json_encode(array(
-			// 	"tanggal"=>$tanggal,
-			// 	"jam"=>$jam,
-			// 	"jarak"=>$jarak
-			// ));
 			$data=array();
-			if($cek->jarak_max >= $jarak && $pd == 0){
 				if($cek_absen->num_rows() <= 0){
 					$realImage = base64_decode($image);
 					$files = file_put_contents("./image/absen/".$name, $realImage);
@@ -358,57 +354,6 @@
 						"pesan"=>"Anda sudah absen pada hari ini"
 					));
 				}
-				
-			}elseif($cek->jarak_max < $jarak && $pd == 0){
-				echo json_encode(array(
-					"status"=>"false",
-					"pesan"=>"Jarak terlalu jauh untuk melakukan absensi"
-				));
-			}elseif($pd == 1){
-				if($cek_absen->num_rows() <= 0){
-					$realImage = base64_decode($image);
-					$files = file_put_contents("./image/absen/".$name, $realImage);
-					$data = array(
-						"tanggal"=>$tanggal,
-						"jam"=>$jam,
-						"id_sales"=>$sales,
-						"foto"=>$name
-					);
-					$insert = $this->db->insert('absen',$data);
-					if($insert){
-						echo json_encode(array(
-							"status"=>200,
-							"pesan"=>"Absen berhasil"
-						));
-					}else{
-						echo json_encode(array(
-							"status"=>"false",
-							"pesan"=>"Absen gagal, mohon coba kembali"
-						));
-					}
-				}else{
-					echo json_encode(array(
-						"status"=>"false",
-						"pesan"=>"Anda sudah absen pada hari ini"
-					));
-				}
-			}
-			// if ($cek->jarak_max > $jarak && $pd == false) {
-
-				
-			// } else if($cek->jarak_max > $jarak && $pd == true){
-			// 	$result = array(
-			// 		'status' => "0",
-			// 		'pesan' => "Radius Absensi tidak boleh melebihi $cek->jarak_max M"
-			// 	);
-			// 	echo json_encode($result);
-			// }else{
-			// 	$result = array(
-			// 		'status' => "0",
-			// 		'pesan' => "Radius Absensi tidak boleh melebihi $cek->jarak_max M"
-			// 	);
-			// 	echo json_encode($result);
-			// }
 		}
 
 	}
@@ -420,6 +365,24 @@
 			"longitude"=>$query->longitude,
 		));
 	}
+
+	public function updateFotoProfile(){
+		$id = $_POST['id'];
+		$image = $_POST['image'];
+    	$name = $_POST['name'];
+		$folderPath="./image/".$name;
+    	$realImage = base64_decode($image);
+   		$files = file_put_contents("./image/profil_user/".$name, $realImage);
+		$data = array(
+            "photo"=> $name,	
+        );
+		$this->db->where('id',$id);
+        $this->db->update('pengguna',$data);
+		echo json_encode(array(
+			"status"=>"1",
+			"pesan"=>"Foto Profil berhasil di perbarui",  
+        ));
+    }
 
 
 	public function sendLocation(){
@@ -597,5 +560,4 @@
 		}
 	} 
 
-  }  
-?>
+  }

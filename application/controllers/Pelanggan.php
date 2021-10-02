@@ -282,6 +282,77 @@ class Pelanggan extends MY_Controller {
       echo json_encode($output);
 
   }
+    public function fetch_data_modals_mobile(){
+      $starts       = $this->input->post("start");
+      $length       = $this->input->post("length");
+      $LIMIT        = "LIMIT $starts, $length ";
+      $draw         = $this->input->post("draw");
+      $search       = $this->input->post('search')['value'];
+      $orders       = isset($_POST['order']) ? $_POST['order'] : ''; 
+      $filter       = $this->input->post('filter');
+
+      
+      $where ="WHERE 1=1 ";
+      
+      $searchingColumn;
+      $result=array();
+      if (isset($search)) {
+        if ($search != '') {
+           $searchingColumn = $search;
+              $where .= " AND (npwp LIKE '%$search%'
+                              OR nama_customer LIKE '%$search%'
+                              OR alamat LIKE '%$search%'
+                              OR telepon LIKE '%$search%'
+                              OR kode_pos LIKE '%$search%'
+                             
+                              )";
+            }
+        }
+
+      if (isset($orders)) {
+          if ($orders != '') {
+            $order = $orders;
+            $order_column = ['','npwp','nama_customer','alamat','telepon','kode_pos'];
+            $order_clm  = $order_column[$order[0]['column']];
+            $order_by   = $order[0]['dir'];
+            $where .= " ORDER BY $order_clm $order_by ";
+          } else {
+            $where .= " ORDER BY id ASC ";
+          }
+        } else {
+          $where .= " ORDER BY id ASC ";
+        }
+        if (isset($LIMIT)) {
+          if ($LIMIT != '') {
+            $where .= ' ' . $LIMIT;
+          }
+        }
+      $index=1;
+      $button="";
+      $fetch = $this->db->query("SELECT * FROM pelanggan $where");
+      $fetch2 = $this->db->query("SELECT * FROM pelanggan");
+      $status ="";
+      foreach($fetch->result() as $rows){
+        
+          $button1 = "<button onclick='return getCustomer(".$rows->id.")' class='btn btn-flat btn-xs btn-success' data-dismiss='modal' type='button'><i class='fa fa-check'></i></button>";
+          $sub_array=array();
+          $sub_array[]=$index;
+          $sub_array[]=$rows->nama_customer;
+          $sub_array[]=$rows->alamat;
+          $sub_array[]=$button1;
+          $result[]   = $sub_array;
+          $index++;
+      }
+      
+      $output = array(
+        "draw"            =>     intval($this->input->post("draw")),
+        "recordsFiltered" =>     $fetch2->num_rows(),
+        "data"            =>     $result,
+       
+      );
+      echo json_encode($output);
+
+  }
 
   public function getById(){
     $id = $this->input->post('id');

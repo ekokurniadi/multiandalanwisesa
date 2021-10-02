@@ -28,10 +28,24 @@
 
   <!-- Page Specific JS File -->
  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
- <script src=" https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script> 
- <script src=" https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script> 
  <script src="https://cdn.ckeditor.com/4.13.1/standard/ckeditor.js"></script>
  <script src="assets/js/page/forms-advanced-forms.js"></script>
+ <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+ <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+ <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap.min.js"></script>
+ <script src=" https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script> 
+ <script src=" https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script> 
+ <script src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+ <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+ <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap.min.js"></script>
+ 
+
+    
+    
+    
+    
+    
+
   
   <script>
   // In your Javascript (external .js resource or <script> tag)

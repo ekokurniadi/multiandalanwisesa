@@ -129,6 +129,7 @@
                                         cell.innerHTML = i + 1 + info.start + ".";
                                     });
                                 });
+                                new $.fn.dataTable.FixedHeader( table );
                                 });
                                 </script>
                            </div> 
