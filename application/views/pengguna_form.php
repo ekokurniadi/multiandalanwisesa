@@ -26,6 +26,17 @@
               </div>
 	   
               <div class="form-group">
+                <label class="col-sm-2 control-label" for="varchar">Cabang <?php echo form_error('nama') ?></label>
+                <div class="col-sm-12">
+                <select name="cabang" id="cabang" class="form-control">
+                  <option value="<?= $cabang?>"><?=$cabang == "" ? "Choose an option" : $cabang ?></option>
+                    <?php foreach($this->db->get('cabang')->result() as $rows):?>
+                      <option value="<?=$rows->nama_cabang?>"><?=$rows->nama_cabang?></option>
+                    <?php endforeach;?>
+                 </select>
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">Nama <?php echo form_error('nama') ?></label>
                 <div class="col-sm-12">
                   <input type="text" class="form-control" name="nama" id="nama" placeholder="Nama" value="<?php echo $nama; ?>" />

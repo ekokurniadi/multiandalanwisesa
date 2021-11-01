@@ -119,7 +119,11 @@ class Pengiriman_barang extends MY_Controller {
         $kata         = $this->input->post('kata_kunci');
        
         $where = "WHERE 1=1 ";
-       
+        if($_SESSION['level']=="Admin"){
+            $where .=" ";
+        }else{
+            $where .=" And cabang ='{$_SESSION['cabang']}' ";
+        }
         $searchingColumn;
         $result=array();
         if (isset($search)) {
@@ -211,6 +215,7 @@ class Pengiriman_barang extends MY_Controller {
 		'nama_ekspedisi' => $this->input->post('nama_ekspedisi',TRUE),
 		'driver' => $this->input->post('driver',TRUE),
 		'penerima' => $this->input->post('penerima',TRUE),
+        'cabang'=> $_SESSION['cabang'],
 	    );
 
             $this->Pengiriman_barang_model->insert($data);
@@ -269,6 +274,7 @@ class Pengiriman_barang extends MY_Controller {
 		'nama_ekspedisi' => $this->input->post('nama_ekspedisi',TRUE),
 		'driver' => $this->input->post('driver',TRUE),
 		'penerima' => $this->input->post('penerima',TRUE),
+        'cabang'=> $_SESSION['cabang'],
 	    );
 
             $this->Pengiriman_barang_model->update($this->input->post('id', TRUE), $data);

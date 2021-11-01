@@ -33,6 +33,11 @@ class Claim extends MY_Controller
         $orders       = isset($_POST["order"]) ? $_POST["order"] : '';
 
         $where = "WHERE 1=1";
+        if($_SESSION['level']=="Admin"){
+            $where .=" ";
+        }else{
+            $where .=" And cabang ='{$_SESSION['cabang']}' ";
+        }
         // $searchingColumn;
         $result = array();
         if (isset($search)) {

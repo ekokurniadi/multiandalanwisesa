@@ -20,7 +20,7 @@
         </div>
         <form action="<?php echo $action; ?>" method="post" class="form-horizontal">
 	   
-                  <input type="text" class="form-control" name="id_pengiriman" id="id_pengiriman" placeholder="No Do" value="<?php echo $id_pengiriman; ?>" />
+                  <input type="hidden" class="form-control" name="id_pengiriman" id="id_pengiriman" placeholder="No Do" value="<?php echo $id_pengiriman; ?>" />
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="varchar">No Do <?php echo form_error('no_do') ?></label>
                 <div class="col-sm-12">

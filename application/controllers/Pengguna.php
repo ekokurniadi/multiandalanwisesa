@@ -30,6 +30,12 @@ class Pengguna extends MY_Controller {
         $orders       = isset($_POST["order"]) ? $_POST["order"] : ''; 
         
         $where ="WHERE 1=1";
+        if($_SESSION['level']=="Admin"){
+            $where .=" ";
+        }else{
+            $where .=" And cabang ='{$_SESSION['cabang']}' ";
+        }
+
         $searchingColumn;
         $result=array();
         if (isset($search)) {
@@ -137,6 +143,7 @@ class Pengguna extends MY_Controller {
 	    'username' => set_value('username'),
 	    'password' => set_value('password'),
 	    'level' => set_value('level'),
+	    'cabang' => set_value('cabang'),
 	    'status' => set_value('status'),
 	);
 
@@ -176,6 +183,7 @@ class Pengguna extends MY_Controller {
                         'username' => $this->input->post('username',TRUE),
                         'password' => $this->input->post('password',TRUE),
                         'level' => $this->input->post('level',TRUE),
+                        'cabang' => $this->input->post('cabang',TRUE),
                         'status' => $this->input->post('status',TRUE),
                     );
 
@@ -204,6 +212,7 @@ class Pengguna extends MY_Controller {
 		'username' => set_value('username', $row->username),
 		'password' => set_value('password', $row->password),
 		'level' => set_value('level', $row->level),
+		'cabang' => set_value('cabang', $row->cabang),
 		'status' => set_value('status', $row->status),
 	    );
             $this->load->view('header');
@@ -244,6 +253,7 @@ class Pengguna extends MY_Controller {
                                 'username' => $this->input->post('username',TRUE),
                                 'password' => $this->input->post('password',TRUE),
                                 'level' => $this->input->post('level',TRUE),
+                                'cabang' => $this->input->post('cabang',TRUE),
                                 'status' => $this->input->post('status',TRUE),
                             );
                         }
@@ -263,6 +273,7 @@ class Pengguna extends MY_Controller {
                                 'username' => $this->input->post('username',TRUE),
                                 'password' => $this->input->post('password',TRUE),
                                 'level' => $this->input->post('level',TRUE),
+                                'cabang' => $this->input->post('cabang',TRUE),
                                 'status' => $this->input->post('status',TRUE),
                             );
                         }
